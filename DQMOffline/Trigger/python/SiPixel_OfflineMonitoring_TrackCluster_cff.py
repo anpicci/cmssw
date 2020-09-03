@@ -619,6 +619,7 @@ hltSiPixelPhase1TrackClustersConf = cms.VPSet(
    hltSiPixelPhase1DigisNdigisOffTrack,
 
    hltSiPixelPhase1TrackClustersDigisOverClusterTotcharge,
+   hltSiPixelPhase1TrackClustersDigisOverClusterTotcharge2D,
 
    hltSiPixelPhase1TrackClustersNTracks,
    hltSiPixelPhase1TrackClustersNTracksInVolume,
