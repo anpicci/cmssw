@@ -38,39 +38,38 @@
 #include "RecoTracker/Record/interface/CkfComponentsRecord.h"
 #include "RecoPixelVertexing/PixelLowPtUtilities/interface/ClusterShapeHitFilter.h"
 
-#include <iostream>
 
 namespace {
 
   class SiPixelPhase1TrackClusters final : public SiPixelPhase1Base {
     enum {
-      ON_TRACK_CHARGE,
-      OFF_TRACK_CHARGE,
-      ON_TRACK_BIGPIXELCHARGE,
-      OFF_TRACK_BIGPIXELCHARGE,
-      ON_TRACK_NOTBIGPIXELCHARGE,
-      OFF_TRACK_NOTBIGPIXELCHARGE,
+      ON_TRACK_CHARGE,//
+      OFF_TRACK_CHARGE,//
+      ON_TRACK_BIGPIXELCHARGE,//
+      OFF_TRACK_BIGPIXELCHARGE,//
+      ON_TRACK_NOTBIGPIXELCHARGE,//
+      OFF_TRACK_NOTBIGPIXELCHARGE,//
 
-      ON_TRACK_SIZE,
-      OFF_TRACK_SIZE,
-      OFF_TRACK_SIZEX,
-      OFF_TRACK_SIZEY,
-      ON_TRACK_SHAPE,
+      ON_TRACK_SIZE,//
+      OFF_TRACK_SIZE,//
+      OFF_TRACK_SIZEX,//
+      OFF_TRACK_SIZEY,//
+      ON_TRACK_SHAPE,//
 
-      ON_TRACK_NCLUSTERS,
-      OFF_TRACK_NCLUSTERS,
+      ON_TRACK_NCLUSTERS,//
+      OFF_TRACK_NCLUSTERS,//
 
-      ON_TRACK_POSITIONB,
-      OFF_TRACK_POSITION_B,
-      ON_TRACK_POSITIONF,
-      OFF_TRACK_POSITION_F,
-      OFF_TRACK_POSITION_XZ,
-      OFF_TRACK_POSITION_YZ,
+      ON_TRACK_POSITIONB,//
+      OFF_TRACK_POSITION_B,//
+      ON_TRACK_POSITIONF,//
+      OFF_TRACK_POSITION_F,//
+      OFF_TRACK_POSITION_XZ,//
+      OFF_TRACK_POSITION_YZ,//
 
-      DIGIS_HITMAP_ON_TRACK,
-      DIGIS_HITMAP_OFF_TRACK,
-      ON_TRACK_NDIGIS,
-      OFF_TRACK_NDIGIS,
+      DIGIS_HITMAP_ON_TRACK,//
+      DIGIS_HITMAP_OFF_TRACK,//
+      ON_TRACK_NDIGIS,//
+      OFF_TRACK_NDIGIS,//
 
       //DIGIS_OVER_CLUSTER_TOTCHARGE,
       //DIGIS_OVER_CLUSTER_TOTCHARGE_2D,
@@ -78,34 +77,34 @@ namespace {
       //OFF_TRACK_READOUT_CHARGE,
       //OFF_TRACK_READOUT_NCLUSTERS,
       
-      NTRACKS,
-      NTRACKS_INVOLUME,
+      NTRACKS,//
+      NTRACKS_INVOLUME,//
 
-      SIZE_VS_ETA_ON_TRACK_OUTER,
-      SIZE_VS_ETA_ON_TRACK_INNER,
-      ON_TRACK_CHARGE_OUTER,
-      ON_TRACK_CHARGE_INNER,
+      SIZE_VS_ETA_ON_TRACK_OUTER,//
+      SIZE_VS_ETA_ON_TRACK_INNER,//
+      ON_TRACK_CHARGE_OUTER,//
+      ON_TRACK_CHARGE_INNER,//
 
-      ON_TRACK_SHAPE_OUTER,
-      ON_TRACK_SHAPE_INNER,
+      ON_TRACK_SHAPE_OUTER,//
+      ON_TRACK_SHAPE_INNER,//
 
-      ON_TRACK_SIZE_X_OUTER,
-      ON_TRACK_SIZE_X_INNER,
-      ON_TRACK_SIZE_X_F,
-      ON_TRACK_SIZE_Y_OUTER,
-      ON_TRACK_SIZE_Y_INNER,
-      ON_TRACK_SIZE_Y_F,
+      ON_TRACK_SIZE_X_OUTER,//
+      ON_TRACK_SIZE_X_INNER,//
+      ON_TRACK_SIZE_X_F,//
+      ON_TRACK_SIZE_Y_OUTER,//
+      ON_TRACK_SIZE_Y_INNER,//
+      ON_TRACK_SIZE_Y_F,//
 
-      ON_TRACK_SIZE_XY_OUTER,
-      ON_TRACK_SIZE_XY_INNER,
-      ON_TRACK_SIZE_XY_F,
-      CHARGE_VS_SIZE_ON_TRACK,
+      ON_TRACK_SIZE_XY_OUTER,//
+      ON_TRACK_SIZE_XY_INNER,//
+      ON_TRACK_SIZE_XY_F,//
+      CHARGE_VS_SIZE_ON_TRACK,//
 
       SIZE_VS_ETA_OFF_TRACK,
       CHARGE_VS_ETA_OFF_TRACK,
-      CHARGE_VS_SIZE_OFF_TRACK,
+      CHARGE_VS_SIZE_OFF_TRACK,//
       
-      ENUM_SIZE
+      ENUM_SIZE//
     };
 
   public:
@@ -192,196 +191,8 @@ namespace {
     }
     auto const& pixelClusterShapeCache = *pixelClusterShapeCacheH;
 
-    std::unordered_set<const SiPixelCluster*> rHSiPixelClusters;
+    //std::unordered_set<const SiPixelCluster*> rHSiPixelClusters;
 
-    for (auto const& track : *tracks) {
-      if (applyVertexCut_ &&
-          (track.pt() < 0.75 || std::abs(track.dxy((*vertices)[0].position())) > 5 * track.dxyError()))
-        continue;
-
-      bool isBpixtrack = false, isFpixtrack = false, crossesPixVol = false;
-
-      // find out whether track crosses pixel fiducial volume (for cosmic tracks)
-      auto d0 = track.d0(), dz = track.dz();
-      if (std::abs(d0) < 16 && std::abs(dz) < 50)
-        crossesPixVol = true;
-
-      auto etatk = track.eta();
-
-      auto const& trajParams = track.extra()->trajParams();
-      assert(trajParams.size() == track.recHitsSize());
-      auto hb = track.recHitsBegin();
-
-      for (unsigned int h = 0; h < track.recHitsSize(); h++) {
-        auto hit = *(hb + h);
-        if (!hit->isValid())
-          continue;
-        auto id = hit->geographicalId();
-
-        // check that we are in the pixel
-        auto subdetid = (id.subdetId());
-        if (subdetid == PixelSubdetector::PixelBarrel)
-          isBpixtrack = true;
-        if (subdetid == PixelSubdetector::PixelEndcap)
-          isFpixtrack = true;
-        if (subdetid != PixelSubdetector::PixelBarrel && subdetid != PixelSubdetector::PixelEndcap)
-          continue;
-        bool iAmBarrel = subdetid == PixelSubdetector::PixelBarrel;
-
-        // PXB_L4 IS IN THE OTHER WAY
-        // CAN BE XORed BUT LETS KEEP THINGS SIMPLE
-        bool iAmOuter = ((tkTpl.pxbLadder(id) % 2 == 1) && tkTpl.pxbLayer(id) != 4) ||
-                        ((tkTpl.pxbLadder(id) % 2 != 1) && tkTpl.pxbLayer(id) == 4);
-
-        auto pixhit = dynamic_cast<const SiPixelRecHit*>(hit->hit());
-        if (!pixhit)
-          continue;
-
-        auto geomdetunit = dynamic_cast<const PixelGeomDetUnit*>(pixhit->detUnit());
-        auto const& topol = geomdetunit->specificTopology();
-
-        // get the cluster
-        auto clustp = pixhit->cluster();
-        if (clustp.isNull())
-          continue;
-        auto const& cluster = *clustp;
-
-	const SiPixelCluster* rHcluster = &*(pixhit->cluster());
-
-	rHSiPixelClusters.insert(rHcluster);
-	/*
-	edm::Handle< edm::DetSetVector<PixelDigi> > pixelDigis;
-	iEvent.getByToken(tPixelDigi, pixelDigis);
-
-	edm::DetSetVector<PixelDigi>::const_iterator DSViter;
-
-	float total_digADC = 0.;
-	*/
-	//std::cout << "rHcluster inserted" << endl;
-        const std::vector<SiPixelCluster::Pixel> pixelsVec = cluster.pixels();
-        for (unsigned int i = 0; i < pixelsVec.size(); ++i) {
-          float pixx = pixelsVec[i].x;  // index as float=iteger, row index
-          float pixy = pixelsVec[i].y;  // same, col index
-
-          bool bigInX = topol.isItBigPixelInX(int(pixx)); // dip solo da pixel
-          bool bigInY = topol.isItBigPixelInY(int(pixy));// dip solo da pixel
-          float pixel_charge = pixelsVec[i].adc;
-	  /*
- 	  for(DSViter = pixelDigis->begin(); DSViter != pixelDigis->end(); DSViter++) {
-	    edm::DetSet<PixelDigi>::const_iterator di;
-	    for(di = DSViter->data.begin(); di != DSViter->data.end(); di++) {
-	      float digADC = di->adc(); // charge, modifued to unsiged short
-	      float digx = di->row(); // row
-	      float digy = di->column(); // column
-	      if(digx == pixx && digy == pixy){
-		total_digADC = total_digADC + digADC;
-		cout << endl << "pix adc: " << pixel_charge << "\tdig adc: " << digADC << endl;
-		//cout << "pix x: " << pixx << "\tdig x: " << digx << endl;
-		//cout << "pix y: " << pixy << "\tdig y: " << digy << endl;
-	      }
-	      else continue;
-	    }
-	  }
-	  cout << endl << "total digis adc so far: " << total_digADC << endl;
-	  */
-
-          if (bigInX == true || bigInY == true) {//si potrebbe fare a parte
-            histo[ON_TRACK_BIGPIXELCHARGE].fill(pixel_charge, id, &iEvent); 
-          } else {
-            histo[ON_TRACK_NOTBIGPIXELCHARGE].fill(pixel_charge, id, &iEvent);
-          }
-        }  // End loop over pixels
-
-	//float digiscluster_ratio = cluster.charge() / total_digADC;
-
-	//histo[DIGIS_OVER_CLUSTER_TOTCHARGE].fill(digiscluster_ratio, id, &iEvent); 
-	//histo[DIGIS_OVER_CLUSTER_TOTCHARGE_2D].fill(cluster.charge(), total_digADC, id, &iEvent); 
-
-	//cout << endl << "cluster charge: " << cluster.charge() << "\ttotal digi adc: " << total_digADC << endl;
-
-        auto const& ltp = trajParams[h];
-
-        auto localDir = ltp.momentum() / ltp.momentum().mag();
-
-        // correct charge for track impact angle
-        auto charge = cluster.charge() * ltp.absdz();//per qualsiasi cluster
-	
-        auto clustgp = pixhit->globalPosition();  // from rechit
-
-        int part;
-        ClusterData::ArrayType meas;
-        std::pair<float, float> pred;
-        if (shapeFilter.getSizes(*pixhit, localDir, pixelClusterShapeCache, part, meas, pred)) {
-          auto shape = shapeFilter.isCompatible(*pixhit, localDir, pixelClusterShapeCache);
-          unsigned shapeVal = (shape ? 1 : 0);
-
-          if (iAmBarrel) {
-            if (iAmOuter) {
-              histo[ON_TRACK_SIZE_X_OUTER].fill(pred.first, cluster.sizeX(), id, &iEvent);
-              histo[ON_TRACK_SIZE_Y_OUTER].fill(pred.second, cluster.sizeY(), id, &iEvent);
-              histo[ON_TRACK_SIZE_XY_OUTER].fill(cluster.sizeY(), cluster.sizeX(), id, &iEvent);
-
-              histo[ON_TRACK_SHAPE_OUTER].fill(shapeVal, id, &iEvent);
-            } else {
-              histo[ON_TRACK_SIZE_X_INNER].fill(pred.first, cluster.sizeX(), id, &iEvent);
-              histo[ON_TRACK_SIZE_Y_INNER].fill(pred.second, cluster.sizeY(), id, &iEvent);
-              histo[ON_TRACK_SIZE_XY_INNER].fill(cluster.sizeY(), cluster.sizeX(), id, &iEvent);
-
-              histo[ON_TRACK_SHAPE_INNER].fill(shapeVal, id, &iEvent);
-            }
-          } else {
-            histo[ON_TRACK_SIZE_X_F].fill(pred.first, cluster.sizeX(), id, &iEvent);
-            histo[ON_TRACK_SIZE_Y_F].fill(pred.second, cluster.sizeY(), id, &iEvent);
-            histo[ON_TRACK_SIZE_XY_F].fill(cluster.sizeY(), cluster.sizeX(), id, &iEvent);
-          }
-          histo[ON_TRACK_SHAPE].fill(shapeVal, id, &iEvent);
-        }
-
-        for (int i = 0; i < cluster.size(); i++) {
-          SiPixelCluster::Pixel const& vecipxl = cluster.pixel(i);
-          histo[DIGIS_HITMAP_ON_TRACK].fill(id, &iEvent, vecipxl.y, vecipxl.x);
-          histo[ON_TRACK_NDIGIS].fill(id, &iEvent);
-        }
-
-        histo[ON_TRACK_NCLUSTERS].fill(id, &iEvent);//qualsiasi cluster
-        histo[ON_TRACK_CHARGE].fill(charge, id, &iEvent);//qualsiasi cluster
-        histo[ON_TRACK_SIZE].fill(cluster.size(), id, &iEvent);//qualsiasi cluster
-
-        histo[ON_TRACK_POSITIONB].fill(clustgp.z(), clustgp.phi(), id, &iEvent);//qualsiasi cluster
-        histo[ON_TRACK_POSITIONF].fill(clustgp.x(), clustgp.y(), id, &iEvent);//qualsiasi cluster
-
-        histo[CHARGE_VS_SIZE_ON_TRACK].fill(cluster.size(), charge, id, &iEvent);//qualsiasi cluster
-
-        if (iAmBarrel)  // Avoid mistakes even if specification < should > handle it
-        {
-          if (iAmOuter) {
-            histo[SIZE_VS_ETA_ON_TRACK_OUTER].fill(etatk, cluster.sizeY(), id, &iEvent);
-            histo[ON_TRACK_CHARGE_OUTER].fill(charge, id, &iEvent);
-          } else {
-            histo[SIZE_VS_ETA_ON_TRACK_INNER].fill(etatk, cluster.sizeY(), id, &iEvent);
-            histo[ON_TRACK_CHARGE_INNER].fill(charge, id, &iEvent);
-          }
-        }
-      }
-
-      // statistics on tracks
-      histo[NTRACKS].fill(1, DetId(0), &iEvent);
-      if (isBpixtrack || isFpixtrack)
-        histo[NTRACKS].fill(2, DetId(0), &iEvent);
-      if (isBpixtrack)
-        histo[NTRACKS].fill(3, DetId(0), &iEvent);
-      if (isFpixtrack)
-        histo[NTRACKS].fill(4, DetId(0), &iEvent);
-
-      if (crossesPixVol) {
-        if (isBpixtrack || isFpixtrack)
-          histo[NTRACKS_INVOLUME].fill(1, DetId(0), &iEvent);
-        else
-          histo[NTRACKS_INVOLUME].fill(0, DetId(0), &iEvent);
-      }
-    }
-
-    
     //statistics clusters off tracks
     edm::Handle<edmNew::DetSetVector<SiPixelCluster>> inputPixel;
     iEvent.getByToken(pixelSrcToken_, inputPixel);
@@ -389,87 +200,275 @@ namespace {
     if (!inputPixel.isValid())
       return;
 
-    bool hasClusters = false;
+    //bool hasClusters = false;
 
     edmNew::DetSetVector<SiPixelCluster>::const_iterator it;    
+    bool isON=false;
+
+    int intrackloop = 0;
 
     for (it = inputPixel->begin(); it != inputPixel->end(); ++it) {
-      auto id = DetId(it->detId());
+      auto gid = DetId(it->detId());
 
-      const PixelGeomDetUnit* theGeomDet = dynamic_cast<const PixelGeomDetUnit*>(tracker_off.idToDet(id));
+      const PixelGeomDetUnit* theGeomDet = dynamic_cast<const PixelGeomDetUnit*>(tracker_off.idToDet(gid));
       const PixelTopology& topol = theGeomDet->specificTopology();
 
-      for (SiPixelCluster const& cluster : *it) {
-	if (!(rHSiPixelClusters.find(&cluster) == rHSiPixelClusters.end())) continue;
-	std::cout << "Off track" << std::endl;
+      for (SiPixelCluster const& gcluster : *it) {
+	//if (!(rHSiPixelClusters.find(&cluster) == rHSiPixelClusters.end())) continue;
+	int checks=0;
+	isON=false;
+	
+	float cluster_x;
+	float cluster_y;
+	float cluster_z;
+	float cluster_phi;
+	float cluster_eta;
+	float cluster_size;
+	float cluster_charge;
+	
+	for (auto const& track : *tracks) {
+	  if (applyVertexCut_ &&
+	      (track.pt() < 0.75 || std::abs(track.dxy((*vertices)[0].position())) > 5 * track.dxyError()))
+	    continue;
 
-	int row = cluster.x() - 0.5, col = cluster.y() - 0.5;
-	const std::vector<SiPixelCluster::Pixel> pixelsVec = cluster.pixels();
-        for (unsigned int i = 0; i < pixelsVec.size(); ++i) {
-          float pixx = pixelsVec[i].x;  // index as float=iteger, row index
-          float pixy = pixelsVec[i].y;  // same, col index
+	  bool isBpixtrack = false, isFpixtrack = false, crossesPixVol = false;
 
-	  cout << endl << i;
-	  /*
-	  if(i > 0){
-	    cout << endl << "exit" << endl;
+	  // find out whether track crosses pixel fiducial volume (for cosmic tracks)
+	  auto d0 = track.d0(), dz = track.dz();
+	  if (std::abs(d0) < 16 && std::abs(dz) < 50)
+	    crossesPixVol = true;
+
+	  auto etatk = track.eta();
+
+	  auto const& trajParams = track.extra()->trajParams();
+	  assert(trajParams.size() == track.recHitsSize());
+	  auto hb = track.recHitsBegin();
+
+	  for (unsigned int h = 0; h < track.recHitsSize(); h++) {
+	    auto hit = *(hb + h);
+	    if (!hit->isValid())
+	      continue;
+	    auto id = hit->geographicalId();
+
+	    if (id.rawId()!=gid.rawId())
+	      continue;
+
+	    // check that we are in the pixel
+	    auto subdetid = (id.subdetId());
+	    if (subdetid == PixelSubdetector::PixelBarrel)
+	      isBpixtrack = true;
+	    if (subdetid == PixelSubdetector::PixelEndcap)
+	      isFpixtrack = true;
+	    if (subdetid != PixelSubdetector::PixelBarrel && subdetid != PixelSubdetector::PixelEndcap)
+	      continue;
+	    
+	    // PXB_L4 IS IN THE OTHER WAY
+	    // CAN BE XORed BUT LETS KEEP THINGS SIMPLE
+
+	    bool iAmBarrel = subdetid == PixelSubdetector::PixelBarrel;
+	    bool iAmOuter = ((tkTpl.pxbLadder(gid) % 2 == 1) && tkTpl.pxbLayer(gid) != 4) ||
+	      ((tkTpl.pxbLadder(id) % 2 != 1) && tkTpl.pxbLayer(gid) == 4);
+
+
+	    auto pixhit = dynamic_cast<const SiPixelRecHit*>(hit->hit());
+	    if (!pixhit)
+	      continue;
+
+	    //auto geomdetunit = dynamic_cast<const PixelGeomDetUnit*>(pixhit->detUnit());
+	    //auto const& topol = geomdetunit->specificTopology();
+
+	    // get the cluster
+	    auto clustp = pixhit->cluster();
+	    if (clustp.isNull())
+	      continue;
+	    auto const& cluster = *clustp;
+
+	    if (isBpixtrack or isFpixtrack){
+	      if(&gcluster==&cluster){//check if hitted cluster in rechit is the pixel cluster we are looping on
+		/*
+		std::cout<<"ONTRACK!"<<std::endl;
+		std::cout<<"DetID: "<< id.rawId() <<" ("<<gid.rawId()<<")"<<std::endl;
+		std::cout<<"SizeX: "<< cluster.sizeX() <<" ("<<gcluster.sizeX()<<")"<<std::endl;
+		std::cout<<"SizeY: "<< cluster.sizeY() <<" ("<<gcluster.sizeY()<<")"<<std::endl;
+		std::cout<<"Charge: "<< cluster.charge() <<" ("<<gcluster.charge()<<")"<<std::endl;
+		*/
+		isON=true;
+
+		//taking cluster position from rechit for the ontrack ones
+		auto clustgp = pixhit->globalPosition();
+		
+		cluster_x = clustgp.x();
+		cluster_y = clustgp.y();
+		cluster_z = clustgp.z();
+		cluster_phi = clustgp.phi();
+		cluster_eta = clustgp.eta();
+		cluster_size = cluster.size();
+		checks++;
+
+		auto const& ltp = trajParams[h];
+		auto localDir = ltp.momentum() / ltp.momentum().mag();
+		cluster_charge = cluster.charge() * ltp.absdz();
+		int part;
+		ClusterData::ArrayType meas;
+		std::pair<float, float> pred;
+	    
+		if (shapeFilter.getSizes(*pixhit, localDir, pixelClusterShapeCache, part, meas, pred)) {
+		  auto shape = shapeFilter.isCompatible(*pixhit, localDir, pixelClusterShapeCache);
+		  unsigned shapeVal = (shape ? 1 : 0);
+
+		  if (iAmBarrel) {
+		    if (iAmOuter) {
+		      histo[ON_TRACK_SIZE_X_OUTER].fill(pred.first, gcluster.sizeX(), gid, &iEvent);
+		      histo[ON_TRACK_SIZE_Y_OUTER].fill(pred.second, gcluster.sizeY(), gid, &iEvent);
+		      histo[ON_TRACK_SIZE_XY_OUTER].fill(gcluster.sizeY(), gcluster.sizeX(), gid, &iEvent);
+		      histo[ON_TRACK_SHAPE_OUTER].fill(shapeVal, gid, &iEvent);
+		    }
+		    else {
+		      histo[ON_TRACK_SIZE_X_INNER].fill(pred.first, gcluster.sizeX(), gid, &iEvent);
+		      histo[ON_TRACK_SIZE_Y_INNER].fill(pred.second, gcluster.sizeY(), gid, &iEvent);
+		      histo[ON_TRACK_SIZE_XY_INNER].fill(gcluster.sizeY(), gcluster.sizeX(), gid, &iEvent);
+		      histo[ON_TRACK_SHAPE_INNER].fill(shapeVal, gid, &iEvent);
+		    }
+		  }
+		  else {
+		    histo[ON_TRACK_SIZE_X_F].fill(pred.first, gcluster.sizeX(), gid, &iEvent);
+		    histo[ON_TRACK_SIZE_Y_F].fill(pred.second, gcluster.sizeY(), gid, &iEvent);
+		    histo[ON_TRACK_SIZE_XY_F].fill(gcluster.sizeY(), gcluster.sizeX(), gid, &iEvent);
+		  }
+		  histo[ON_TRACK_SHAPE].fill(shapeVal, gid, &iEvent);
+		}
+
+		if (iAmBarrel){
+		  if (iAmOuter){
+		    histo[SIZE_VS_ETA_ON_TRACK_OUTER].fill(etatk, gcluster.sizeY(), gid, &iEvent);
+		    histo[ON_TRACK_CHARGE_OUTER].fill(cluster_charge, gid, &iEvent);
+		  }
+		  else{
+		    histo[SIZE_VS_ETA_ON_TRACK_INNER].fill(etatk, gcluster.sizeY(), gid, &iEvent);
+		    histo[ON_TRACK_CHARGE_INNER].fill(cluster_charge, gid, &iEvent);
+		  }
+		}
+
+		break;
+	      }
+	      else
+		checks++;
+	    }
+	  }
+
+	  if(intrackloop==0){
+	    // statistics on tracks                                                                                                 
+	    histo[NTRACKS].fill(1, DetId(0), &iEvent);
+	    if (isBpixtrack || isFpixtrack)
+	      histo[NTRACKS].fill(2, DetId(0), &iEvent);
+	    if (isBpixtrack)
+	      histo[NTRACKS].fill(3, DetId(0), &iEvent);
+	    if (isFpixtrack)
+	      histo[NTRACKS].fill(4, DetId(0), &iEvent);
+	    
+	    if (crossesPixVol) {
+	      if (isBpixtrack || isFpixtrack)
+		histo[NTRACKS_INVOLUME].fill(1, DetId(0), &iEvent);
+	      else
+		histo[NTRACKS_INVOLUME].fill(0, DetId(0), &iEvent);
+	    }
+	    //std::cout<<"Ntracks"<<std::endl;
+	  }
+	  intrackloop++;
+	  if (isON){    
+	    //std::cout<<"Breaking tracks loop!"<<std::endl;
 	    break;
 	  }
-	  */
-          bool bigInX = topol.isItBigPixelInX(int(pixx)); // dip solo da pixel
-          bool bigInY = topol.isItBigPixelInY(int(pixy));// dip solo da pixel
-          float pixel_charge = pixelsVec[i].adc;
+	}
 
-          if (bigInX == true || bigInY == true) {//si potrebbe fare a parte
-            histo[OFF_TRACK_BIGPIXELCHARGE].fill(pixel_charge, id, &iEvent); 
-	    std::cout << "BigPixel charge plotted" << std::endl;
-          } 
-	  else {
-            histo[OFF_TRACK_NOTBIGPIXELCHARGE].fill(pixel_charge, id, &iEvent);
-	    std::cout << "NotBigPixel charge plotted" << std::endl;
-          }
-        }  // End loop over pixels
-	
-	for (int i = 0; i < cluster.size(); i++) {
-          SiPixelCluster::Pixel const& vecipxl = cluster.pixel(i);
-          histo[DIGIS_HITMAP_OFF_TRACK].fill(id, &iEvent, vecipxl.y, vecipxl.x);
-          histo[OFF_TRACK_NDIGIS].fill(id, &iEvent);
-        }
+	if(isON){
+	  histo[ON_TRACK_SIZE].fill(cluster_size, gid, &iEvent);
+	  histo[ON_TRACK_CHARGE].fill(cluster_charge, gid, &iEvent);
+	  histo[ON_TRACK_POSITIONB].fill(cluster_z, cluster_phi, gid, &iEvent);
+	  histo[ON_TRACK_POSITIONF].fill(cluster_x, cluster_y, gid, &iEvent);
+	  histo[CHARGE_VS_SIZE_ON_TRACK].fill(cluster_size, cluster_charge, gid, &iEvent);
+	}
 
-	//histo[OFF_TRACK_READOUT_CHARGE].fill(double(cluster.charge()), id, &iEvent, col, row);
-        histo[OFF_TRACK_CHARGE].fill(double(cluster.charge()), id, &iEvent, col, row);
-        histo[OFF_TRACK_SIZE].fill(double(cluster.size()), id, &iEvent, col, row);
-        histo[OFF_TRACK_SIZEX].fill(double(cluster.sizeX()), id, &iEvent, col, row);
-        histo[OFF_TRACK_SIZEY].fill(double(cluster.sizeY()), id, &iEvent, col, row);
-        histo[OFF_TRACK_NCLUSTERS].fill(id, &iEvent, col, row);
+	if(!isON){
+	  //taking cluster position from cluster itself for the offtrack ones
+	  LocalPoint gclustlp = topol.localPosition(MeasurementPoint(gcluster.x(), gcluster.y()));
+	  GlobalPoint gclustgp = theGeomDet->surface().toGlobal(gclustlp);
+	  int row = gcluster.x() - 0.5, col = gcluster.y() - 0.5;	  
+	  
+	  cluster_x = gclustgp.x();
+	  cluster_y = gclustgp.y(); 
+	  cluster_z = gclustgp.z(); 
+	  cluster_phi = gclustgp.phi();
+	  cluster_eta = gclustgp.eta();
+	  cluster_size = gcluster.size();
+	  cluster_charge = gcluster.charge();
 
+	  histo[OFF_TRACK_SIZE].fill(double(cluster_size), gid, &iEvent, col, row);
+	  histo[OFF_TRACK_SIZEX].fill(double(gcluster.sizeX()), gid, &iEvent, col, row);
+	  histo[OFF_TRACK_SIZEY].fill(double(gcluster.sizeY()), gid, &iEvent, col, row);
+	  histo[OFF_TRACK_CHARGE].fill(cluster_charge, gid, &iEvent);
+
+	  histo[OFF_TRACK_POSITION_B].fill(cluster_z, cluster_phi, gid, &iEvent);
+	  histo[OFF_TRACK_POSITION_F].fill(cluster_x, cluster_y, gid, &iEvent);
+	  histo[OFF_TRACK_POSITION_XZ].fill(cluster_x, cluster_z, gid, &iEvent);
+	  histo[OFF_TRACK_POSITION_YZ].fill(cluster_y, cluster_z, gid, &iEvent);
+	  histo[SIZE_VS_ETA_OFF_TRACK].fill(cluster_eta, gcluster.sizeY(), gid, &iEvent);
+	  histo[CHARGE_VS_ETA_OFF_TRACK].fill(cluster_eta, cluster_charge, gid, &iEvent);
+	  histo[CHARGE_VS_SIZE_OFF_TRACK].fill(cluster_size, cluster_charge, gid, &iEvent);
+	}
+
+	for (int i = 0; i < gcluster.size(); i++) {
+	    SiPixelCluster::Pixel const& vecipxl = gcluster.pixel(i);
+	    if(isON){
+	      histo[DIGIS_HITMAP_ON_TRACK].fill(gid, &iEvent, vecipxl.y, vecipxl.x);
+	      histo[ON_TRACK_NDIGIS].fill(gid, &iEvent);
+	    }
+	    else{
+	      histo[DIGIS_HITMAP_OFF_TRACK].fill(gid, &iEvent, vecipxl.y, vecipxl.x);
+	      histo[OFF_TRACK_NDIGIS].fill(gid, &iEvent);
+	    }
+	}
 	/*
-        if (cluster.size() > 1) {
-          histo[OFF_TRACK_READOUT_NCLUSTERS].fill(id, &iEvent);
-        }
+	std::cout << "cluster_x: " << cluster_x << " cluster_y: " << cluster_y << " cluster_z: " << cluster_z << " cluster_phi: " << cluster_phi << " cluster_eta: " << cluster_eta << " cluster_size: " << cluster_size << " cluster_charge: " << cluster_charge << std::endl;
+	std::cout<<"Checks Needed: "<<checks<<std::endl;
 	*/
 
-        LocalPoint clustlp = topol.localPosition(MeasurementPoint(cluster.x(), cluster.y()));
-        GlobalPoint clustgp = theGeomDet->surface().toGlobal(clustlp);
-        
-	histo[OFF_TRACK_POSITION_B].fill(clustgp.z(), clustgp.phi(), id, &iEvent);
-        histo[OFF_TRACK_POSITION_F].fill(clustgp.x(), clustgp.y(), id, &iEvent);
-        histo[OFF_TRACK_POSITION_XZ].fill(clustgp.x(), clustgp.z(), id, &iEvent);
-        histo[OFF_TRACK_POSITION_YZ].fill(clustgp.y(), clustgp.z(), id, &iEvent);
-        histo[SIZE_VS_ETA_OFF_TRACK].fill(clustgp.eta(), cluster.sizeY(), id, &iEvent);
-	histo[CHARGE_VS_ETA_OFF_TRACK].fill(clustgp.eta(), cluster.charge(), id, &iEvent);
-	histo[CHARGE_VS_SIZE_OFF_TRACK].fill(cluster.sizeY(), cluster.charge(), id, &iEvent);
+	const std::vector<SiPixelCluster::Pixel> pixelsVec = gcluster.pixels();
+        for (unsigned int i = 0; i < pixelsVec.size(); ++i) {
+          float pixx = pixelsVec[i].x;  // index as float=iteger, row index          
+	  float pixy = pixelsVec[i].y;  // same, col index              
+	  //std::cout << std::endl << i << std::endl;
 
+          bool bigInX = topol.isItBigPixelInX(int(pixx)); // dip solo da pixel                                 
+	  bool bigInY = topol.isItBigPixelInY(int(pixy));// dip solo da pixel                                                
+	  float pixel_charge = pixelsVec[i].adc;
+
+          if (bigInX == true || bigInY == true) {//si potrebbe fare a parte                         
+	    if(isON){
+	      histo[ON_TRACK_BIGPIXELCHARGE].fill(pixel_charge, gid, &iEvent);
+	    }
+	    else{
+	      histo[OFF_TRACK_BIGPIXELCHARGE].fill(pixel_charge, gid, &iEvent);
+	    }
+          }
+	  else {
+	    if(isON){
+	      histo[ON_TRACK_NOTBIGPIXELCHARGE].fill(pixel_charge, gid, &iEvent);
+	    }
+	    else{
+	      histo[OFF_TRACK_NOTBIGPIXELCHARGE].fill(pixel_charge, gid, &iEvent);
+	    }
+          }
+	}
       }
-
     }
     
     histo[ON_TRACK_NCLUSTERS].executePerEventHarvesting(&iEvent);
     histo[ON_TRACK_NDIGIS].executePerEventHarvesting(&iEvent);
     histo[OFF_TRACK_NCLUSTERS].executePerEventHarvesting(&iEvent);
     histo[OFF_TRACK_NDIGIS].executePerEventHarvesting(&iEvent);
+  
   }
-
 }  // namespace
 
 #include "FWCore/Framework/interface/MakerMacros.h"
